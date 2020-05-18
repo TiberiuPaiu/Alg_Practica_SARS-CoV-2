@@ -1,10 +1,13 @@
 import sys
 import csv
 import os.path
-
+import urllib.request
 directorio="muestras"
 archiu="sequences.csv"
 con_archiu=[]
+dic_mediana={}
+mostra1=""
+mostra2=""
 
 def ller_csv(archiu_csv):
 	with open(archiu_csv) as File:
@@ -18,7 +21,7 @@ def coprobar_csv(archiu_csv):
 	if os.path.exists(archiu_csv):
 		ller_csv(archiu_csv)
 	else:
-		print ("El fichero no existe :",archiu_csv)	
+		print ("La ruta no existe :",archiu_csv)	
 
 def mostra_patalla(lista, *claves):
 	
@@ -40,40 +43,72 @@ def mostra_patalla(lista, *claves):
 			print ("\n")
 			
 			
-def mediana(lista):
-	dic_result = {}
-	suma=0;
+def mediana():
 	cont=0;
-	for i in range(len(lista)-1):		
-		suma+=int(lista[i]["Length"])
+	## conta el numero maximo de quatos paises son i guardar el numero maximo por cada pais.
+	for i in range(len(con_archiu)-1):		
 		cont+=1
-		dic_result[lista[i]["Geo_Location"]]=[cont,suma,0]
+		dic_mediana[con_archiu[i]["Geo_Location"]]=[cont,0,""]
 
-		if lista[i]["Geo_Location"] != lista[i+1]["Geo_Location"]:
+		if con_archiu[i]["Geo_Location"] != con_archiu[i+1]["Geo_Location"]:
 			suma=0
 			cont=0
 		
-		if i == len(lista)-2  :
-			suma+=int(lista[i+1]["Length"])
+		if i == len(con_archiu)-2  :
 			cont+=1
-			dic_result[lista[i]["Geo_Location"]]=[cont,suma,0]
-	
+			dic_mediana[con_archiu[i]["Geo_Location"]]=[cont,0,""]
 
-	for row, v in dic_result.items():
-		v[2]=v[1] / v[0]
-		print(row,"-",v[2] )
-				
+	## hacer la mediana por conjutos 	
+	j=0;c=0;
+	for row, v in dic_mediana.items():
+		
+		if v[0] % 2 == 1:
+			aputa=v[0] / 2
+			v[1]=con_archiu[j+int(aputa)]["Length"]
+			v[2]=con_archiu[j+int(aputa)]["Accession"]
+		else:
+			aputa=v[0] / 2
+			r=(int(con_archiu[j+round(aputa)]["Length"]) + int(con_archiu[j+round(aputa-1)]["Length"]) )/2
+			v[1]=round(r)
+			v[2]=con_archiu[j+int(aputa-1)]["Accession"]
+			
+			
+		j+=v[0]
+		c+=1  
+		print(c,"-",row,"-",v[1],"-",v[2] )
+
+def partition(sort_list, low, high):
+    i = (low -1)
+    pivot = sort_list[high]["Geo_Location"]
+    for j in range(low, high):
+        if sort_list[j]["Geo_Location"] <= pivot:
+            i += 1
+            sort_list[i], sort_list[j] = sort_list[j], sort_list[i]
+    sort_list[i+1],sort_list[high] = sort_list[high], sort_list[i+1]
+    return (i+1)
+            
+def div_veceras(sort_list, low, high):
+    if low < high:
+        pi = partition(sort_list, low, high)
+        div_veceras(sort_list, low, pi-1)
+        div_veceras(sort_list, pi+1, high)
 	
 def main(): 
 	if len(sys.argv) == 2:
 		coprobar_csv(sys.argv[1]+"/sequences.csv")
 	else:
 		coprobar_csv(directorio+"/"+archiu)
-	
-	mostra_patalla(con_archiu,"Geo_Location","Length")
-	sorted_list = sorted(con_archiu, key=lambda item: item["Geo_Location"])
-	print ("\n")
-	mostra_patalla(sorted_list,"Geo_Location","Length")
-	mediana(sorted_list)
 
+	mostra_patalla(con_archiu,"Geo_Location","Length")
+	print ("\n")
+	div_veceras(con_archiu, 0, len(con_archiu) - 1)
+	mostra_patalla(con_archiu,"Geo_Location","Length")
+	mediana()
+	Genotype
+	print ("Mostra 1 :")
+	mostra1 = input() 
+	urllib.request.urlretrieve("https://www.ncbi.nlm.nih.gov/nuccore/"+mostra1+"?report=fasta")
+	print ("Mostra 2 :")
+	mostra2 = input()
+	
 main()
