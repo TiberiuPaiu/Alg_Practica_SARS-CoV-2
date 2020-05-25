@@ -20,14 +20,13 @@ class Kmeans:
         iterations: num iterations we want for the algorithm to found
                     a good solution
         clusters: list of clusters
-        min, max: minimum and maximum value of our inputdata
         """
         self.data = inputdata
         self.k = k
         self.iterations = iterations
         self.clusters = []
         self.min = 0
-        self.max = len(self.data) 
+        self.max = 0
 
     def search_max_min(self):
         """
@@ -44,8 +43,8 @@ class Kmeans:
         """
         Generating randomly our clusters between min and max
         """
-        for _ in range(self.k - 1):
-            cluster = [self.data[random.randint(0, len(self.data) - 1 )][1]]
+        for _ in range(self.k):
+            cluster = [random.randint(self.min, self.max)]
             self.clusters.append(cluster)
 
     def compute_clusters(self):

@@ -14,9 +14,10 @@ class NeedlemanWunsch:
     and compute the coincidences of two sequences
     """
 
-    def __init__(self, match=1, mismatch=0):
+    def __init__(self, match=1, mismatch=0, gap=0):
         self.match = match
         self.mismatch = mismatch
+        self.gap = gap
         self.matrix = []
         self.value_comparation = 0
 
@@ -39,10 +40,10 @@ class NeedlemanWunsch:
         for j in range(2, len(seq_1) + 2):
             for i in range(2, len(seq_2) + 2):
                 self.matrix[i, j] = max(self.matrix[i - 1][j - 1] + is_equal[seq_1[j - 2] == seq_2[i - 2]],
-                                        self.matrix[i - 1][j] ,
-                                        self.matrix[i][j - 1] )
+                                        self.matrix[i - 1][j] + self.gap,
+                                        self.matrix[i][j - 1] + self.gap)
+        
         if len(matrix) >= len(matrix[0]):
             self.value_comparation = (len(matrix) - 2) - self.matrix[i, j] 
         else:
             self.value_comparation = (len(matrix[0]) - 2) - self.matrix[i, j]
-

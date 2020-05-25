@@ -25,13 +25,14 @@ class Alignment:
         """
         Alignment of sequences main function
         """
-
+        explored = []
         files_list = listdir("FASTA/")
-        for i in range(len(files_list)):
-            for j in range(len(files_list)):
-                if files_list[i] != files_list[j] :
-                    self.extract_sequence(files_list[i], files_list[j])
-
+        for first_file in files_list:
+            for second_file in files_list:
+                if second_file not in explored:
+                    if first_file != second_file:
+                        self.extract_sequence(first_file, second_file)
+            explored.append(first_file)
 
     def extract_sequence(self, file_1, file_2):
         """

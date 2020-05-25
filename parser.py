@@ -9,7 +9,6 @@ Participants:
 
 import csv
 
-
 class Parser:
     """
     Parser to read just the info we need
@@ -35,21 +34,17 @@ class Parser:
 
         with open(inputfile, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
-            i = 0
             for row in reader:
                 country = row['Geo_Location'].split(":")
+                row['Geo_Location'] = country[0]
                 self.dades.append(row)
-                self.dades[i]['Geo_Location'] = country[0]
-                print(self.dades[i]['Geo_Location'])
-
 
 def parser_fasta(fasta_file):
     """
     Extract the sequence of the Fasta files
-    max length of a sequence = 1000
     """
 
-    with open("FASTA/" + fasta_file, "r") as file:
+    with open("FASTA/"+fasta_file, "r") as file:
         sequence = ""
         line = file.readline()
         line = file.readline()

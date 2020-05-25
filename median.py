@@ -6,88 +6,89 @@ Participants:
     Dand Marbà
     Pau Agustí
 """
+#to avoid recursion limit problems
+import sys
+sys.setrecursionlimit(10000)
+
 class Median:
-	"""
-	Class that contains methods and functions
-	to calculate the median of every country
-	"""
+    """
+    Class that countains methods and functions
+    to calculate the median of every country
+    """
 
-	def __init__(self, dades):
-  
-		self.dades = dades
-		self.result = {}
-		
-	def median(self):
-		self.sort(self.dades, 0, len(self.dades) - 1, "Geo_Location")
-		self.n_porpais(self.dades)
-		self.calculate_median(self.result)
-			
-	def sort(self, sort_list, low, high,key):
-		#Just quick sort algorith implemented for the sorter
+    def __init__(self, data):
+        self.data = data
+        self.result = {}
 
-    		if low < high:
-        		pi = partition(sort_list, low, high,key)
-        		self.sort(sort_list, low, pi-1,key)
-        		self.sort(sort_list, pi+1, high,key)
-		
-	def n_porpais(self,dades):
-		
-		#Contar por cada pais quantos son del mismo i guadar quantos para poder hacer la mediana. Una ver agrupados todos los paises oredenar por su Length
-		
+    def median(self):
+        """
+        Class main method
+        """
+        self.sort(self.data, 0, len(self.data) - 1, "Geo_Location")
+        self.lengths_for_country(self.data)
+        self.calculate_median(self.result)
 
-		cont=0;
-		for i in range(len(dades)-1):		
-			cont+=1
-			self.result[dades[i]["Geo_Location"]]=[cont,0,""]
+    def sort(self, sort_list, low, high, key):
+        """
+        Just quick sort algorith implemented for the sorter
+        """
 
-			if dades[i]["Geo_Location"] != dades[i+1]["Geo_Location"]:
-				suma=0
-				cont=0
-		
-			if i == len(dades)-2  :
-				cont+=1
-				self.result[dades[i]["Geo_Location"]]=[cont,0,""]
-		
-		j=0;
-		for row, v in self.result.items():
-			self.sort(dades, j, v[0]-1,"Length")
-			j+=v[0]
-			
-	
-	def calculate_median(self,result):
-		"""
-		Calculates the median of a sorted list
-		"""
+        if low < high:
+            partition_index = partition(sort_list, low, high, key)
+            self.sort(sort_list, low, partition_index-1, key)
+            self.sort(sort_list, partition_index+1, high, key)
 
-		j=0;c=0;
-		for row, v in result.items():
-		
-			if v[0] % 2 == 1:
-				aputa=v[0] / 2
-				v[1]=self.dades[j+int(aputa)]["Length"]
-				v[2]=self.dades[j+int(aputa)]["Accession"]
-			else:
-				aputa=v[0] / 2
-				r=(int(self.dades[j+round(aputa)]["Length"]) + int(self.dades[j+round(aputa-1)]["Length"]) )/2
-				v[1]=round(r)
-				v[2]=self.dades[j+int(aputa-1)]["Accession"]
-			
-			j+=v[0]
-			c+=1
-			print(row,"-",v[1],"-",v[2] )
-		
-		
-	
-def partition(sort_list, low, high ,key):
-	"""
-	Used on quick_sort() not necessary to be a method, so implemented as function
-	"""
-	
-	i = (low -1)
-	pivot = sort_list[high][key]
-	for j in range(low, high):
-		if sort_list[j][key] <= pivot:
-			i += 1
-			sort_list[i], sort_list[j] = sort_list[j], sort_list[i]
-	sort_list[i+1],sort_list[high] = sort_list[high], sort_list[i+1]
-	return (i+1)	
+    def lengths_for_country(self, data):
+        """
+        Classificate lengths for country and sort them
+        """
+
+        count = 0
+        for i in range(len(data)-1):
+            count += 1
+            self.result[data[i]["Geo_Location"]] = [count, 0, ""]
+
+            if data[i]["Geo_Location"] != data[i+1]["Geo_Location"]:
+                count = 0
+
+            if i == len(data)-2:
+                count += 1
+                self.result[data[i]["Geo_Location"]] = [count, 0, ""]
+
+        j = 0
+        for row, item in self.result.items():
+            self.sort(data, j, item[0]-1, "Length")
+            j += item[0]
+
+    def calculate_median(self, result):
+        """
+        Calculates the median of a sorted list
+        """
+
+        j = 0
+        for row, item in result.items():
+            if item[0] % 2 == 1:
+                pointer = item[0] / 2
+                item[1] = self.data[j+int(pointer)]["Length"]
+                item[2] = self.data[j+int(pointer)]["Accession"]
+            else:
+                pointer = item[0] / 2
+                med = (int(self.data[j+round(pointer)]["Length"]) + int(self.data[j+round(pointer-1)]["Length"]))/2
+                item[1] = round(med)
+                item[2] = self.data[j+int(pointer-1)]["Accession"]
+            j += item[0]
+            print(row, "-", item[1], "-", item[2])
+
+def partition(sort_list, low, high, key):
+    """
+    Used on sort() not necessary to be a method, so implemented as function
+    """
+
+    i = (low -1)
+    pivot = sort_list[high][key]
+    for j in range(low, high):
+        if sort_list[j][key] <= pivot:
+            i += 1
+            sort_list[i], sort_list[j] = sort_list[j], sort_list[i]
+    sort_list[i+1], sort_list[high] = sort_list[high], sort_list[i+1]
+    return i+1
